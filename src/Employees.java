@@ -4,6 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,92 +33,126 @@ public class Employees {
         return conn;
     }
 
-    public void create(String emp_name, String contact_num, String gender) {
-        try {
-            String sql = "INSERT INTO employees (emp_name, contact_num, gender)  VALUES ('" + emp_name + "', '" + contact_num + "', '" + gender + "')";
-            Statement statement = connect().createStatement();
+    public static Map<String, Object> create(String emp_name, String contact_num, String gender) {
+        Map<String, Object> result = new LinkedHashMap<>();
 
-            int rowsAffected = statement.executeUpdate(sql);
+        try {
+            String sql = "INSERT INTO employees (emp_name, contact_num, gender)  VALUES (?, ?, ?)";
+            PreparedStatement pstmt = connect().prepareStatement(sql);
+
+            pstmt.setString(1, emp_name);
+            pstmt.setString(2, contact_num);
+            pstmt.setString(3, gender);
+
+            int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Employee added successfully.");
+                result.put("success", true);
+                result.put("message", "Employee added successfully");
             } else {
-                System.out.println("Failed to add employee.");
+                result.put("success", false);
+                result.put("message", "Failed to add employee");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Employees.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return result;
     }
 
-    public void read() {
+    public static String[][] read() {
+        String[][] dataArray = null;
+
         try {
             String sql = "SELECT * FROM employees";
             PreparedStatement statement = connect().prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
 
             if (!resultSet.equals(0)) {
-                while (resultSet.next()) {
-                    // Retrieve values from the result set
-                    int emp_id = resultSet.getInt("emp_id");
-                    String emp_name = resultSet.getString("emp_name");
-                    String contact_num = resultSet.getString("contact_num");
-                    String gender = resultSet.getString("gender");
+                // Get the column count
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
 
-                    // Process the retrieved data
-                    System.out.println("ID: " + emp_id);
-                    System.out.println("Name: " + emp_name);
-                    System.out.println("Contact no: " + contact_num);
-                    System.out.println("Gender: " + gender);
-                    System.out.println("---------------------------");
+                // Creating a list to store the data
+                List<String[]> data = new ArrayList<>();
+
+                // Iterating over the result set and populating the list
+                while (resultSet.next()) {
+
+                    String[] row = new String[columnCount];
+                    int index = 0;
+                    for (int i = 1; i <= columnCount; i++) {
+                        row[index++] = resultSet.getString(i);
+                    }
+                    data.add(row);
                 }
-            }else{
-                System.out.println("No employees found!");
-            }
+                // Converting the list to a 2D array
+                dataArray = new String[data.size()][columnCount];
+                for (int i = 0; i < data.size(); i++) {
+                    dataArray[i] = data.get(i);
+                }
+            } 
 
         } catch (SQLException e) {
-             e.printStackTrace();
+            e.printStackTrace();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Employees.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        return dataArray;
     }
 
-    public void update(int emp_id, String emp_name, String contact_num, String gender) {
+    public static Map<String, Object> update(int emp_id, String emp_name, String contact_num, String gender) {
+        Map<String, Object> result = new LinkedHashMap<>();
         try {
-            String sql = "UPDATE employees SET emp_name = '" + emp_name + "', contact_num = '" + contact_num + "', gender = '" + gender + "' WHERE emp_id = '" + emp_id + "'";
-            Statement statement = connect().createStatement();
+            String sql = "UPDATE employees SET emp_name = ?, contact_num = ?, gender = ? WHERE emp_id = ?";
+            PreparedStatement pstmt = connect().prepareStatement(sql);
 
-            int rowsAffected = statement.executeUpdate(sql);
+            pstmt.setString(1, emp_name);
+            pstmt.setString(2, contact_num);
+            pstmt.setString(3, gender);
+            pstmt.setInt(4, emp_id);
+
+            int rowsAffected = pstmt.executeUpdate();
 
             if (rowsAffected > 0) {
-                System.out.println("Employee updated successfully.");
+                result.put("success", true);
+                result.put("message", "Employee updated successfully");
             } else {
-                System.out.println("Failed to update employee.");
+                result.put("success", false);
+                result.put("message", "Failed to update employee");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Employees.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return result;
     }
 
-    public void delete(int emp_id) {
+    public static Map<String, Object> delete(int emp_id) {
+        Map<String, Object> result = new LinkedHashMap<>();
         try {
-            String sql = "DELETE FROM employees WHERE emp_id = '" + emp_id + "'";
-            Statement statement = connect().createStatement();
+            String sql = "DELETE FROM employees WHERE emp_id = ?";
 
-            int rowsAffected = statement.executeUpdate(sql);
+            PreparedStatement pstmt = connect().prepareStatement(sql);
+
+            pstmt.setInt(1, emp_id);
+
+            int rowsAffected = pstmt.executeUpdate();
 
             if (rowsAffected > 0) {
-                System.out.println("Employee deleted successfully.");
+                result.put("success", true);
+                result.put("message", "Employee removed successfully");
             } else {
-                System.out.println("Failed to delete employee.");
+                result.put("success", false);
+                result.put("message", "Failed to remove employee");
             }
         } catch (SQLException e) {
-           e.printStackTrace();;
+            e.printStackTrace();;
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Employees.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return result;
     }
+
 }
