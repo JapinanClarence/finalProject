@@ -436,7 +436,7 @@ public class Peripherals {
 
             if (rowsAffected > 0) {
                 result.put("success", true);
-                result.put("message", "Remove assignment successfull");
+                result.put("message", "Assignment removed successfully");
             } else {
                 result.put("success", false);
                 result.put("message", "Failed to remove assignment");
