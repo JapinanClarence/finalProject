@@ -22,6 +22,7 @@ import java.util.Map;
  * @author japin
  */
 public class Peripherals {
+
     //Execute sql connection
     private static Connection connect() throws SQLException, ClassNotFoundException {
         // url
@@ -67,7 +68,7 @@ public class Peripherals {
                     result.put("message", "Failed to create peripheral");
                 }
 
-            }else{
+            } else {
                 String sql = "INSERT INTO devices (device_code, name, peripheral, assigned_to)  VALUES (?, ?, ?, ?)";
                 PreparedStatement pstmt = connect().prepareStatement(sql);
 
@@ -75,7 +76,7 @@ public class Peripherals {
                 pstmt.setString(2, name);
                 pstmt.setString(3, peripheral);
                 pstmt.setString(4, assigned_to);
-                
+
                 int rowsAffected = pstmt.executeUpdate();
                 if (rowsAffected > 0) {
                     result.put("success", true);
@@ -85,7 +86,6 @@ public class Peripherals {
                     result.put("message", "Failed to create peripheral");
                 }
             }
-            
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -96,12 +96,58 @@ public class Peripherals {
     }
 
     /**
+     * Fetch all peripherals
+     *
+     * @return array
+     */
+    public static String[][] peripherals() {
+        String[][] dataArray = null;
+        try {
+            String sql = "SELECT * FROM devices";
+            PreparedStatement statement = connect().prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet != null) {
+                // Get the column count
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                // Creating a list to store the data
+                List<String[]> data = new ArrayList<>();
+
+                // Iterating over the result set and populating the list
+                while (resultSet.next()) {
+
+                    String[] row = new String[columnCount];
+                    int index = 0;
+                    for (int i = 1; i <= columnCount; i++) {
+                        row[index++] = resultSet.getString(i);
+                    }
+                    data.add(row);
+
+                }
+                // Converting the list to a 2D array
+                dataArray = new String[data.size()][columnCount];
+                for (int i = 0; i < data.size(); i++) {
+                    dataArray[i] = data.get(i);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Employees.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return dataArray;
+    }
+    
+    /**
      * Show specific peripheral record
      *
      * @param device_code
      * @return array
      */
-    public static Map<String, Object> fetchPeripheralRecord(String device_code) {
+    public static Map<String, Object> peripheralRecord(String device_code) {
         Map<String, Object> result = new LinkedHashMap<>();
         try {
             String sql = "SELECT * FROM devices WHERE device_code = ?";
@@ -190,7 +236,7 @@ public class Peripherals {
      *
      * @return array
      */
-    public static String[][] peripherals() {
+    public static String[][] assignedPeripherals() {
         String[][] dataArray = null;
         try {
             String sql = "SELECT * FROM devices WHERE assigned_to != 'null'";
@@ -371,32 +417,45 @@ public class Peripherals {
      * @param peripheral
      * @param assigned_to
      * @param device_code
-     *
-     * Will update the current peripheral.
+     * @param verificationCode
+     * 
      * @return Boolean Will return true if successfully updated a peripheral
+     * Will ask a verification code to allow update. If verification is success, update the current peripheral.
+     * This method will not update peripherals that are assigned to any employee
      */
-    public static Map<String, Object> update(String device_code, String name, String peripheral, String assigned_to) {
+    public static Map<String, Object> update(String device_code, String name, String peripheral, String assigned_to, String verificationCode) {
         Map<String, Object> result = new LinkedHashMap<>();
         try {
-
-            String sql = "UPDATE devices SET name = ?, peripheral = ? , assigned_to = ? WHERE device_code = ?";
-
-            PreparedStatement pstmt = connect().prepareStatement(sql);
-
-            pstmt.setString(1, name);
-            pstmt.setString(2, peripheral);
-            pstmt.setString(3, assigned_to);
-            pstmt.setString(4, device_code);
-
-            int rowsAffected = pstmt.executeUpdate();
-
-            if (rowsAffected > 0) {
-                result.put("success", true);
-                result.put("message", "Peripheral updated successfully");
-            } else {
+            if (verifyUpdate(verificationCode) != true) {
                 result.put("success", false);
-                result.put("message", "Failed to update peripheral");
+                result.put("message", "Not verified");
+            }else{
+                if (isPeripheralAssigned(device_code) == true) {
+                    result.put("success", false);
+                    result.put("message", "The peripheral is assigned to an employee. Failed to update the device.");
+                } else {
+
+                    String sql = "UPDATE devices SET name = ?, peripheral = ? , assigned_to = ? WHERE device_code = ?";
+
+                    PreparedStatement pstmt = connect().prepareStatement(sql);
+
+                    pstmt.setString(1, name);
+                    pstmt.setString(2, peripheral);
+                    pstmt.setString(3, assigned_to);
+                    pstmt.setString(4, device_code);
+
+                    int rowsAffected = pstmt.executeUpdate();
+
+                    if (rowsAffected > 0) {
+                        result.put("success", true);
+                        result.put("message", "Peripheral updated successfully");
+                    } else {
+                        result.put("success", false);
+                        result.put("message", "Failed to update peripheral");
+                    }
+                }
             }
+            
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -444,6 +503,12 @@ public class Peripherals {
         return result;
     }
 
+    /**
+     *
+     * @param device_code
+     * @return Array Will return true if successfully removed peripheral
+     * assignment to a device
+     */
     public static Map<String, Object> removePeripheralAssignment(String device_code) {
         Map<String, Object> result = new LinkedHashMap<>();
         try {
@@ -543,5 +608,21 @@ public class Peripherals {
             Logger.getLogger(Peripherals.class.getName()).log(Level.SEVERE, null, ex);
         }
         return result;
+    }
+
+    /**
+     * Verification method
+     *
+     * @param code
+     * @return Boolean If true, allow the user to execute update method
+     */
+    private static boolean verifyUpdate(String code) {
+        Boolean allow = false;
+        String VERIFICATION_CODE = "007-CK";
+        //verify code
+        if (code.equals(VERIFICATION_CODE)) {
+            allow = true;
+        }
+        return allow;
     }
 }
