@@ -17,26 +17,25 @@ public class Main {
      */
     public static void main(String[] args) {
 //        Peripherals p = new Peripherals();
-        //System.out.println(Peripherals.create("Redragon Lakshmi", "Input", "Zen Candia"));
-        //System.out.println(Arrays.deepToString(p.fetchInputDevices()));
-        //System.out.println(Arrays.deepToString(p.fetchInputOutputDevices())); 
-        //System.out.println(Arrays.deepToString(p.fetchOutputDevices()));
-        //System.out.println(Arrays.deepToString(Peripherals.peripherals()));
-        //System.out.println(Arrays.deepToString(p.availablePeripherals()));
-        //System.out.println( p.fetchPeripheralRecord("2023-0007"));
-        System.out.println(Peripherals.delete("2023-0007"));
-        //System.out.println(Peripherals.removePeripheralAssignment("2023-0007"));
-        //System.out.println(Peripherals.update("2023-0001", "BT-Speaker", "Output", "Clarence Japinan"));
-        //System.out.println(p.isPeripheralAssigned("2023-0011"));
-        //Reports r = new Reports();
-        //System.out.println( r.assignedEmployees());
-        //System.out.println( r.assignedPeripherals());
-        //System.out.println(r.availablePeripherals());
-        //System.out.println(r.inputDevices());
-        //System.out.println(r.inputOutputDevices());
-        //System.out.println(Arrays.deepToString(Employees.read()));
-        //e.delete(8);
+        //System.out.println(Peripherals.create("Redragon Lakshmi", "Input", ""));
+//        System.out.println("Input devices: \n" +Arrays.deepToString(Peripherals.fetchInputDevices()));
+//        System.out.println("Input/Output devices: \n" +Arrays.deepToString(Peripherals.fetchInputOutputDevices())); 
+//        System.out.println("Output devices: \n" +Arrays.deepToString(Peripherals.fetchOutputDevices()));
+//        System.out.println("Assigned devices: \n" +Arrays.deepToString(Peripherals.peripherals()));
+//        System.out.println("Available devices: \n" +Arrays.deepToString(Peripherals.availablePeripherals()));
+//        System.out.println( "Peripheral Information: \n" +Peripherals.fetchPeripheralRecord("2023-0001"));
+        //System.out.println(Peripherals.delete("2023-0001"));
+        //System.out.println(Peripherals.removePeripheralAssignment("2023-0001"));
+        //System.out.println(Peripherals.update("2023-0005", "Redragon Lakshmi", "Input", "Zen Candia"));
+
+        System.out.println( "Reports: \n" +Reports.report());
+        //System.out.println(Employees.create("Jade Lore", "09123456789", "Female"));
+        //System.out.println(Employees.update(9, "Jade Lore", "09123456789", "Male"));
+        //System.out.println(Employees.delete(9));
         
+//        System.out.println("Employees: \n" +Arrays.deepToString(Employees.read()));
+//        System.out.println("Male Employees: \n" +Arrays.deepToString(Employees.fetchMaleEmployees()));
+//        System.out.println("Female Employees: \n" +Arrays.deepToString(Employees.fetchFemaleEmployees()));
     }
 
 }

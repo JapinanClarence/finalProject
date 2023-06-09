@@ -4,7 +4,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.Map;
  * @author japin
  */
 public class Peripherals {
-
+    //Execute sql connection
     private static Connection connect() throws SQLException, ClassNotFoundException {
         // url
         String url = "jdbc:mysql://localhost:3306/dorsu_inventory_system";
@@ -49,23 +48,44 @@ public class Peripherals {
     public static Map<String, Object> create(String name, String peripheral, String assigned_to) {
         Map<String, Object> result = new LinkedHashMap<>();
         try {
+            //execute if assigned_to is an empty string
+            if (assigned_to.equals("")) {
+                //will not assign the devices to any employees
+                String sql = "INSERT INTO devices (device_code, name, peripheral, assigned_to)  VALUES (?, ?, ?, NULL)";
+                PreparedStatement pstmt = connect().prepareStatement(sql);
 
-            String sql = "INSERT INTO devices (device_code, name, peripheral, assigned_to)  VALUES (?, ?, ?, ?)";
-            PreparedStatement pstmt = connect().prepareStatement(sql);
+                pstmt.setString(1, getCode());
+                pstmt.setString(2, name);
+                pstmt.setString(3, peripheral);
 
-            pstmt.setString(1, getCode());
-            pstmt.setString(2, name);
-            pstmt.setString(3, peripheral);
-            pstmt.setString(4, assigned_to);
+                int rowsAffected = pstmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    result.put("success", true);
+                    result.put("message", "Peripheral created successfully");
+                } else {
+                    result.put("success", false);
+                    result.put("message", "Failed to create peripheral");
+                }
 
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                result.put("success", true);
-                result.put("message", "Peripheral created successfully");
-            } else {
-                result.put("success", false);
-                result.put("message", "Failed to create peripheral");
+            }else{
+                String sql = "INSERT INTO devices (device_code, name, peripheral, assigned_to)  VALUES (?, ?, ?, ?)";
+                PreparedStatement pstmt = connect().prepareStatement(sql);
+
+                pstmt.setString(1, getCode());
+                pstmt.setString(2, name);
+                pstmt.setString(3, peripheral);
+                pstmt.setString(4, assigned_to);
+                
+                int rowsAffected = pstmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    result.put("success", true);
+                    result.put("message", "Peripheral created successfully");
+                } else {
+                    result.put("success", false);
+                    result.put("message", "Failed to create peripheral");
+                }
             }
+            
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -425,11 +445,11 @@ public class Peripherals {
     }
 
     public static Map<String, Object> removePeripheralAssignment(String device_code) {
-         Map<String, Object> result = new LinkedHashMap<>();
+        Map<String, Object> result = new LinkedHashMap<>();
         try {
             String removeAssignmentQuery = "UPDATE devices SET assigned_to = NULL WHERE device_code = ?";
             PreparedStatement pstmt = connect().prepareStatement(removeAssignmentQuery);
-            
+
             pstmt.setString(1, device_code);
 
             int rowsAffected = pstmt.executeUpdate();
@@ -442,7 +462,6 @@ public class Peripherals {
                 result.put("message", "Failed to remove assignment");
             }
 
-            
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException ex) {

@@ -32,7 +32,13 @@ public class Employees {
         Connection conn = DriverManager.getConnection(url, username, password);
         return conn;
     }
-
+    /**
+     * Create method
+     * @param emp_name
+     * @param contact_num
+     * @param gender
+     * @return Boolean Will return true if successfully added employee
+     */
     public static Map<String, Object> create(String emp_name, String contact_num, String gender) {
         Map<String, Object> result = new LinkedHashMap<>();
 
@@ -59,7 +65,10 @@ public class Employees {
         }
         return result;
     }
-
+    /**
+     * Read method
+     * @return Array Will return set of employees
+     */
     public static String[][] read() {
         String[][] dataArray = null;
 
@@ -68,7 +77,7 @@ public class Employees {
             PreparedStatement statement = connect().prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
 
-            if (!resultSet.equals(0)) {
+            if (resultSet != null) {
                 // Get the column count
                 ResultSetMetaData metaData = resultSet.getMetaData();
                 int columnCount = metaData.getColumnCount();
@@ -100,7 +109,102 @@ public class Employees {
         }
         return dataArray;
     }
+    /**
+     * Fetch male employees
+     * @return Array Will return set of male employees
+     */
+    public static String[][] fetchMaleEmployees() {
+        String[][] dataArray = null;
 
+        try {
+            String sql = "SELECT * FROM employees WHERE gender = 'Male'";
+            PreparedStatement statement = connect().prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet != null) {
+                // Get the column count
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                // Creating a list to store the data
+                List<String[]> data = new ArrayList<>();
+
+                // Iterating over the result set and populating the list
+                while (resultSet.next()) {
+
+                    String[] row = new String[columnCount];
+                    int index = 0;
+                    for (int i = 1; i <= columnCount; i++) {
+                        row[index++] = resultSet.getString(i);
+                    }
+                    data.add(row);
+                }
+                // Converting the list to a 2D array
+                dataArray = new String[data.size()][columnCount];
+                for (int i = 0; i < data.size(); i++) {
+                    dataArray[i] = data.get(i);
+                }
+            } 
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Employees.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return dataArray;
+    }
+    /**
+     * Fetch female employees
+     * @return Array Will fetch set of female employees
+     */
+    public static String[][] fetchFemaleEmployees() {
+        String[][] dataArray = null;
+
+        try {
+            String sql = "SELECT * FROM employees WHERE gender = 'Female'";
+            PreparedStatement statement = connect().prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet != null) {
+                // Get the column count
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                // Creating a list to store the data
+                List<String[]> data = new ArrayList<>();
+
+                // Iterating over the result set and populating the list
+                while (resultSet.next()) {
+
+                    String[] row = new String[columnCount];
+                    int index = 0;
+                    for (int i = 1; i <= columnCount; i++) {
+                        row[index++] = resultSet.getString(i);
+                    }
+                    data.add(row);
+                }
+                // Converting the list to a 2D array
+                dataArray = new String[data.size()][columnCount];
+                for (int i = 0; i < data.size(); i++) {
+                    dataArray[i] = data.get(i);
+                }
+            } 
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Employees.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return dataArray;
+    }
+    /**
+     * Update method
+     * @param emp_id
+     * @param emp_name
+     * @param contact_num
+     * @param gender
+     * @return Boolean Will return true if successfully updated employee
+     */
     public static Map<String, Object> update(int emp_id, String emp_name, String contact_num, String gender) {
         Map<String, Object> result = new LinkedHashMap<>();
         try {
@@ -128,7 +232,11 @@ public class Employees {
         }
         return result;
     }
-
+    /**
+     * Delete employee
+     * @param emp_id
+     * @return Boolean Will return true if successfully removed employee
+     */
     public static Map<String, Object> delete(int emp_id) {
         Map<String, Object> result = new LinkedHashMap<>();
         try {

@@ -4,6 +4,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,7 +17,8 @@ import java.util.logging.Logger;
  *
  * @author japin
  */
-public class Reports{
+public class Reports {
+
     private static Connection connect() throws SQLException, ClassNotFoundException {
         //url
         String url = "jdbc:mysql://localhost:3306/dorsu_inventory_system";
@@ -27,12 +30,26 @@ public class Reports{
         Connection conn = DriverManager.getConnection(url, username, password);
         return conn;
     }
+
+    public static Map<String, Object> report() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        result.put("Available Peripherals", availablePeripherals());
+        result.put("Assigned Peripherals", assignedPeripherals());
+        result.put("Input Devices", inputDevices());
+        result.put("Output Devices", outputDevices());
+        result.put("Input/Output Devices", inputOutputDevices());
+        result.put("Assigned Employee", assignedEmployees());
+
+        return result;
+    }
+
     /**
      * Available peripherals
-     * @return count
-     * Will return total number of available peripherals
+     *
+     * @return count Will return total number of available peripherals
      */
-    public static int availablePeripherals(){
+    private static int availablePeripherals() {
         int count = 0;
         try {
             String sql = "SELECT * FROM devices";
@@ -56,13 +73,13 @@ public class Reports{
         }
         return count;
     }
-    
+
     /**
      * Assigned peripherals
-     * @return count
-     * Will return total number of assigned peripherals
+     *
+     * @return count Will return total number of assigned peripherals
      */
-    public static int assignedPeripherals(){
+    private static int assignedPeripherals() {
         int count = 0;
         try {
             String sql = "SELECT * FROM devices WHERE assigned_to != 'null'";
@@ -84,12 +101,13 @@ public class Reports{
         }
         return count;
     }
+
     /**
      * Input devices
-     * @return count
-     * Will return total number of input devices
+     *
+     * @return count Will return total number of input devices
      */
-    public static int inputDevices(){
+    private static int inputDevices() {
         int count = 0;
         try {
             String sql = "SELECT * FROM devices WHERE peripheral = 'Input'";
@@ -111,12 +129,13 @@ public class Reports{
         }
         return count;
     }
+
     /**
      * Output devices
-     * @return count
-     * Will return total number of output devices
+     *
+     * @return count Will return total number of output devices
      */
-    public static int outputDevices(){
+    private static int outputDevices() {
         int count = 0;
         try {
             String sql = "SELECT * FROM devices WHERE peripheral = 'Output'";
@@ -137,12 +156,13 @@ public class Reports{
         }
         return count;
     }
-     /**
+
+    /**
      * Input Output devices
-     * @return count
-     * Will return total number of input/output devices
+     *
+     * @return count Will return total number of input/output devices
      */
-    public static int inputOutputDevices(){
+    private static int inputOutputDevices() {
         int count = 0;
         try {
             String sql = "SELECT * FROM devices WHERE peripheral = 'Input/Output'";
@@ -163,15 +183,16 @@ public class Reports{
         }
         return count;
     }
+
     /**
      * Assigned employees
-     * @return count
-     * Will return total number of assigned employees
+     *
+     * @return count Will return total number of assigned employees
      */
-    public static int assignedEmployees() {
-        int count = 1;
+    private static int assignedEmployees() {
+        int count = 0;
         try {
-            String sql = "SELECT e.emp_name, d.name FROM employees e join devices d on d.assigned_to = e.emp_name";
+            String sql = "SELECT COUNT(*) AS count FROM (SELECT DISTINCT assigned_to FROM devices) AS d WHERE d.assigned_to != 'NULL'";
             PreparedStatement statement = connect().prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
 
@@ -179,9 +200,7 @@ public class Reports{
                 System.out.println("No employees found!");
             } else {
                 while (resultSet.next()) {
-                    if (resultSet.next()) {
-                        count++;
-                    }
+                    count = resultSet.getInt("count");
                 }
             }
 
@@ -192,6 +211,5 @@ public class Reports{
         }
         return count;
     }
-    
-    
+
 }
