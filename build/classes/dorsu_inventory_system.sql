@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 08, 2023 at 07:38 AM
+-- Generation Time: Jun 09, 2023 at 01:27 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.0.25
 
@@ -39,9 +39,8 @@ CREATE TABLE `devices` (
 --
 
 INSERT INTO `devices` (`device_code`, `name`, `peripheral`, `assigned_to`) VALUES
-('2023-0001', 'Basues Encock WM01', 'Output', 'Clarence Japinan'),
-('2023-0003', 'Sample', 'Input/Output', NULL),
-('2023-0004', 'Royal Kludge RK71', 'Input', 'Zen Candia');
+('2023-0001', 'BT-Speaker', 'Output', 'Clarence Japinan'),
+('2023-0006', 'ViewSonic', 'Output ', NULL);
 
 -- --------------------------------------------------------
 
@@ -95,7 +94,7 @@ INSERT INTO `peripherals` (`name`, `description`) VALUES
 ALTER TABLE `devices`
   ADD PRIMARY KEY (`device_code`),
   ADD KEY `peripheral` (`peripheral`),
-  ADD KEY `assigned_to` (`assigned_to`);
+  ADD KEY `devices_ibfk_2` (`assigned_to`);
 
 --
 -- Indexes for table `employees`
@@ -118,7 +117,7 @@ ALTER TABLE `peripherals`
 -- AUTO_INCREMENT for table `employees`
 --
 ALTER TABLE `employees`
-  MODIFY `emp_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `emp_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
@@ -129,7 +128,7 @@ ALTER TABLE `employees`
 --
 ALTER TABLE `devices`
   ADD CONSTRAINT `devices_ibfk_1` FOREIGN KEY (`peripheral`) REFERENCES `peripherals` (`name`),
-  ADD CONSTRAINT `devices_ibfk_2` FOREIGN KEY (`assigned_to`) REFERENCES `employees` (`emp_name`);
+  ADD CONSTRAINT `devices_ibfk_2` FOREIGN KEY (`assigned_to`) REFERENCES `employees` (`emp_name`) ON DELETE CASCADE ON UPDATE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
