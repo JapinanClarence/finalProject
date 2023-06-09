@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 09, 2023 at 01:27 AM
+-- Generation Time: Jun 09, 2023 at 06:12 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.0.25
 
@@ -39,8 +39,11 @@ CREATE TABLE `devices` (
 --
 
 INSERT INTO `devices` (`device_code`, `name`, `peripheral`, `assigned_to`) VALUES
-('2023-0001', 'BT-Speaker', 'Output', 'Clarence Japinan'),
-('2023-0006', 'ViewSonic', 'Output ', NULL);
+('2023-0001', 'Royal Kludge RK71', 'Input', 'Clarence Japinan'),
+('2023-0002', 'FaxMachine', 'Input/Output', 'Kaarlo Sasiang'),
+('2023-0003', 'Sample', 'Output', NULL),
+('2023-0004', 'LG monitor', 'Output ', NULL),
+('2023-0005', 'Redragon Lakshmi', 'Input', 'Zen Candia');
 
 -- --------------------------------------------------------
 
@@ -94,7 +97,7 @@ INSERT INTO `peripherals` (`name`, `description`) VALUES
 ALTER TABLE `devices`
   ADD PRIMARY KEY (`device_code`),
   ADD KEY `peripheral` (`peripheral`),
-  ADD KEY `devices_ibfk_2` (`assigned_to`);
+  ADD KEY `assigned_to` (`assigned_to`);
 
 --
 -- Indexes for table `employees`
@@ -117,7 +120,7 @@ ALTER TABLE `peripherals`
 -- AUTO_INCREMENT for table `employees`
 --
 ALTER TABLE `employees`
-  MODIFY `emp_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `emp_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Constraints for dumped tables
