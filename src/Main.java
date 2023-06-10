@@ -37,7 +37,7 @@ public class Main {
 //        System.out.println("Employees: \n" +Arrays.deepToString(Employees.read()));
 //        System.out.println("Male Employees: \n" +Arrays.deepToString(Employees.fetchMaleEmployees()));
 //        System.out.println("Female Employees: \n" +Arrays.deepToString(Employees.fetchFemaleEmployees()));
-new PeripheralsFrame().setVisible(true);
+//new PeripheralsFrame().setVisible(true);
         //System.out.println(Arrays.deepToString(Peripherals.sortNameAsc()));
     }
 
