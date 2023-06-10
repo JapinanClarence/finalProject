@@ -5,7 +5,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -32,8 +34,10 @@ public class Employees {
         Connection conn = DriverManager.getConnection(url, username, password);
         return conn;
     }
+
     /**
      * Create method
+     *
      * @param emp_name
      * @param contact_num
      * @param gender
@@ -65,8 +69,10 @@ public class Employees {
         }
         return result;
     }
+
     /**
      * Read method
+     *
      * @return Array Will return set of employees
      */
     public static String[][] read() {
@@ -100,7 +106,7 @@ public class Employees {
                 for (int i = 0; i < data.size(); i++) {
                     dataArray[i] = data.get(i);
                 }
-            } 
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -109,8 +115,10 @@ public class Employees {
         }
         return dataArray;
     }
+
     /**
      * Fetch male employees
+     *
      * @return Array Will return set of male employees
      */
     public static String[][] fetchMaleEmployees() {
@@ -144,7 +152,7 @@ public class Employees {
                 for (int i = 0; i < data.size(); i++) {
                     dataArray[i] = data.get(i);
                 }
-            } 
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -153,8 +161,10 @@ public class Employees {
         }
         return dataArray;
     }
+
     /**
      * Fetch female employees
+     *
      * @return Array Will fetch set of female employees
      */
     public static String[][] fetchFemaleEmployees() {
@@ -188,7 +198,7 @@ public class Employees {
                 for (int i = 0; i < data.size(); i++) {
                     dataArray[i] = data.get(i);
                 }
-            } 
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -197,8 +207,10 @@ public class Employees {
         }
         return dataArray;
     }
+
     /**
      * Update method
+     *
      * @param emp_id
      * @param emp_name
      * @param contact_num
@@ -232,8 +244,10 @@ public class Employees {
         }
         return result;
     }
+
     /**
      * Delete employee
+     *
      * @param emp_id
      * @return Boolean Will return true if successfully removed employee
      */

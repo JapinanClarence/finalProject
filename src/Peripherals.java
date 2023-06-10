@@ -49,7 +49,7 @@ public class Peripherals {
     public static Map<String, Object> create(String name, String peripheral, String assigned_to) {
         Map<String, Object> result = new LinkedHashMap<>();
         try {
-            //execute if assigned_to is an empty string
+            //Will not assign device to employee
             if (assigned_to.equals("")) {
                 //will not assign the devices to any employees
                 String sql = "INSERT INTO devices (device_code, name, peripheral, assigned_to)  VALUES (?, ?, ?, NULL)";
@@ -67,7 +67,7 @@ public class Peripherals {
                     result.put("success", false);
                     result.put("message", "Failed to create peripheral");
                 }
-
+                //will assign device to employee
             } else {
                 String sql = "INSERT INTO devices (device_code, name, peripheral, assigned_to)  VALUES (?, ?, ?, ?)";
                 PreparedStatement pstmt = connect().prepareStatement(sql);
@@ -140,7 +140,7 @@ public class Peripherals {
         }
         return dataArray;
     }
-    
+
     /**
      * Show specific peripheral record
      *
@@ -418,44 +418,40 @@ public class Peripherals {
      * @param assigned_to
      * @param device_code
      * @param verificationCode
-     * 
+     *
      * @return Boolean Will return true if successfully updated a peripheral
-     * Will ask a verification code to allow update. If verification is success, update the current peripheral.
-     * This method will not update peripherals that are assigned to any employee
+     * Will ask a verification code to allow update. If verification is success,
+     * update the current peripheral. This method will not update peripherals
+     * that are assigned to any employee
      */
-    public static Map<String, Object> update(String device_code, String name, String peripheral, String assigned_to, String verificationCode) {
+    public static Map<String, Object> update(String device_code, String name, String peripheral, String assigned_to) {
         Map<String, Object> result = new LinkedHashMap<>();
         try {
-            if (verifyUpdate(verificationCode) != true) {
+
+            if (isPeripheralAssigned(device_code) == true) {
                 result.put("success", false);
-                result.put("message", "Not verified");
-            }else{
-                if (isPeripheralAssigned(device_code) == true) {
-                    result.put("success", false);
-                    result.put("message", "The peripheral is assigned to an employee. Failed to update the device.");
+                result.put("message", "The peripheral is assigned to an employee. Failed to update the device.");
+            } else {
+
+                String sql = "UPDATE devices SET name = ?, peripheral = ? , assigned_to = ? WHERE device_code = ?";
+
+                PreparedStatement pstmt = connect().prepareStatement(sql);
+
+                pstmt.setString(1, name);
+                pstmt.setString(2, peripheral);
+                pstmt.setString(3, assigned_to);
+                pstmt.setString(4, device_code);
+
+                int rowsAffected = pstmt.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    result.put("success", true);
+                    result.put("message", "Peripheral updated successfully");
                 } else {
-
-                    String sql = "UPDATE devices SET name = ?, peripheral = ? , assigned_to = ? WHERE device_code = ?";
-
-                    PreparedStatement pstmt = connect().prepareStatement(sql);
-
-                    pstmt.setString(1, name);
-                    pstmt.setString(2, peripheral);
-                    pstmt.setString(3, assigned_to);
-                    pstmt.setString(4, device_code);
-
-                    int rowsAffected = pstmt.executeUpdate();
-
-                    if (rowsAffected > 0) {
-                        result.put("success", true);
-                        result.put("message", "Peripheral updated successfully");
-                    } else {
-                        result.put("success", false);
-                        result.put("message", "Failed to update peripheral");
-                    }
+                    result.put("success", false);
+                    result.put("message", "Failed to update peripheral");
                 }
             }
-            
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -529,8 +525,10 @@ public class Peripherals {
 
         } catch (SQLException e) {
             e.printStackTrace();
+
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Peripherals.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Peripherals.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
         return result;
     }
@@ -571,11 +569,13 @@ public class Peripherals {
                 } else {
                     String id = "0001";
                     code = yearPrefix + "-" + id;
+
                 }
 
             }
         } catch (SQLException | ClassNotFoundException ex) {
-            Logger.getLogger(Peripherals.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Peripherals.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
         return code;
     }
@@ -604,8 +604,10 @@ public class Peripherals {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Peripherals.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Peripherals.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
         return result;
     }
@@ -614,10 +616,11 @@ public class Peripherals {
      * Verification method
      *
      * @param code
-     * @return Boolean If true, allow the user to execute update method
+     * @return Boolean If true, allow the user to execute a method
      */
-    private static boolean verifyUpdate(String code) {
+    private static boolean verifyCode(String code) {
         Boolean allow = false;
+
         String VERIFICATION_CODE = "007-CK";
         //verify code
         if (code.equals(VERIFICATION_CODE)) {
