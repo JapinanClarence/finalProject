@@ -17,7 +17,7 @@ public class Main {
     public static void main(String[] args) {
 //        Peripherals p = new Peripherals();
         //System.out.println(Peripherals.create("Redragon Lakshmi", "Input", ""));
-        
+
 //        System.out.println("Peripherals: \n" + Arrays.deepToString(Peripherals.peripherals()));
 //        System.out.println("Peripheral Information: \n" + Peripherals.peripheralRecord("2023-0001"));
 //        System.out.println("Input devices: \n" + Arrays.deepToString(Peripherals.fetchInputDevices()));
@@ -25,7 +25,6 @@ public class Main {
 //        System.out.println("Output devices: \n" + Arrays.deepToString(Peripherals.fetchOutputDevices()));
 //        System.out.println("Assigned devices: \n" + Arrays.deepToString(Peripherals.assignedPeripherals()));
 //        System.out.println("Available devices: \n" + Arrays.deepToString(Peripherals.availablePeripherals()));
-
 //        System.out.println(Peripherals.delete("2023-0001"));
 //        System.out.println(Peripherals.removePeripheralAssignment("2023-0001"));
 //        System.out.println(Peripherals.update("2023-0004", "Redragon Lakshmi", "Input", "Zen Candia", "007-CK"));
@@ -33,12 +32,13 @@ public class Main {
         //System.out.println(Employees.create("Jade Lore", "09123456789", "Female"));
         //System.out.println(Employees.update(9, "Jade Lore", "09123456789", "Male"));
         //System.out.println(Employees.delete(9));
-       // System.out.println(Employees.read());
+        // System.out.println(Employees.read());
         //System.out.println(Arrays.deepToString(Employees.fetchMaleEmployees()));
 //        System.out.println("Employees: \n" +Arrays.deepToString(Employees.read()));
 //        System.out.println("Male Employees: \n" +Arrays.deepToString(Employees.fetchMaleEmployees()));
 //        System.out.println("Female Employees: \n" +Arrays.deepToString(Employees.fetchFemaleEmployees()));
-    new PeripheralsFrame().setVisible(true);
+new PeripheralsFrame().setVisible(true);
+        //System.out.println(Arrays.deepToString(Peripherals.sortNameAsc()));
     }
 
 }

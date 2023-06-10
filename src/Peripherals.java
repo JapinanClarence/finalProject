@@ -409,7 +409,92 @@ public class Peripherals {
         }
         return dataArray;
     }
+    /**
+     * Sort method
+     * Will sort peripheral devices by name in ascending order
+     * @return 
+     */
+    public static String[][] sortNameAsc() {
+        String[][] dataArray = null;
+        try {
+            String sql = "SELECT * FROM devices ORDER BY name ASC";
+            PreparedStatement statement = connect().prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
 
+            if (resultSet != null) {
+                // Get the column count
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                // Creating a list to store the data
+                List<String[]> data = new ArrayList<>();
+
+                // Iterating over the result set and populating the list
+                while (resultSet.next()) {
+
+                    String[] row = new String[columnCount];
+                    int index = 0;
+                    for (int i = 1; i <= columnCount; i++) {
+                        row[index++] = resultSet.getString(i);
+                    }
+                    data.add(row);
+                }
+                // Converting the list to a 2D array
+                dataArray = new String[data.size()][columnCount];
+                for (int i = 0; i < data.size(); i++) {
+                    dataArray[i] = data.get(i);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Employees.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return dataArray;
+    }
+    /**
+     * Sort method
+     * Will sort peripheral devices by name in descending order
+     * @return 
+     */
+    public static String[][] sortNameDesc() {
+        String[][] dataArray = null;
+        try {
+            String sql = "SELECT * FROM devices ORDER BY name DESC";
+            PreparedStatement statement = connect().prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet != null) {
+                // Get the column count
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                // Creating a list to store the data
+                List<String[]> data = new ArrayList<>();
+
+                // Iterating over the result set and populating the list
+                while (resultSet.next()) {
+
+                    String[] row = new String[columnCount];
+                    int index = 0;
+                    for (int i = 1; i <= columnCount; i++) {
+                        row[index++] = resultSet.getString(i);
+                    }
+                    data.add(row);
+                }
+                // Converting the list to a 2D array
+                dataArray = new String[data.size()][columnCount];
+                for (int i = 0; i < data.size(); i++) {
+                    dataArray[i] = data.get(i);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Employees.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return dataArray;
+    }
     /**
      * Update Method
      *
@@ -419,10 +504,8 @@ public class Peripherals {
      * @param device_code
      * @param verificationCode
      *
-     * @return Boolean Will return true if successfully updated a peripheral
-     * Will ask a verification code to allow update. If verification is success,
-     * update the current peripheral. This method will not update peripherals
-     * that are assigned to any employee
+     * @return true if successfully updated a peripheral This method will not
+     * update peripherals that are assigned to any employee
      */
     public static Map<String, Object> update(String device_code, String name, String peripheral, String assigned_to) {
         Map<String, Object> result = new LinkedHashMap<>();
@@ -465,15 +548,16 @@ public class Peripherals {
      * Delete peripheral method
      *
      * @param device_code
-     * @return Boolean Will return true if successfully deleted a peripheral
-     * This method will not delete assigned peripherals
+     * @return return true if successfully deleted a peripheral This method will
+     * not delete assigned peripherals
      */
     public static Map<String, Object> delete(String device_code) {
         Map<String, Object> result = new LinkedHashMap<>();
         try {
+
             if (isPeripheralAssigned(device_code) == true) {
                 result.put("success", false);
-                result.put("message", "The peripheral is currently assigned to an employee. Unassign it first before deleting");
+                result.put("message", "peripheral is assigned");
             } else {
                 String sql = "DELETE FROM devices WHERE device_code = ?";
 
@@ -502,8 +586,7 @@ public class Peripherals {
     /**
      *
      * @param device_code
-     * @return Array Will return true if successfully removed peripheral
-     * assignment to a device
+     * @return true if successfully removed peripheral assignment to a device
      */
     public static Map<String, Object> removePeripheralAssignment(String device_code) {
         Map<String, Object> result = new LinkedHashMap<>();
@@ -584,7 +667,7 @@ public class Peripherals {
      * Verify id the device/peripheral is assigned
      *
      * @param device_code
-     * @return Boolean
+     * @return true if peripheral is assigned
      */
     private static Boolean isPeripheralAssigned(String device_code) {
         Boolean result = false;
@@ -616,9 +699,9 @@ public class Peripherals {
      * Verification method
      *
      * @param code
-     * @return Boolean If true, allow the user to execute a method
+     * @return
      */
-    private static boolean verifyCode(String code) {
+    public static boolean verifyCode(String code) {
         Boolean allow = false;
 
         String VERIFICATION_CODE = "007-CK";

@@ -1,4 +1,5 @@
 
+import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -20,18 +21,28 @@ public class PeripheralsFrame extends javax.swing.JFrame {
      */
     public PeripheralsFrame() {
         initComponents();
+        this.setEmployees();
         this.populateTable();
     }
 
+    private void setEmployees() {
+        String[][] resData = Employees.read();
+        for (String[] data : resData) {
+            String assigned_To = data[1];
+
+            empNameField.addItem(assigned_To);
+        }
+    }
+
     private void populateTable() {
-        var resData = Peripherals.peripherals();
-        for (var data : resData) {
+        String[][] resData = Peripherals.peripherals();
+        for (String[] data : resData) {
             String deviceCode = data[0];
             String name = data[1];
             String peripheral = data[2];
-            String assignedTo = data[3];
+            String assigned_To = data[3];
 
-            Object[] newRow = {deviceCode, name, peripheral, assignedTo};
+            Object[] newRow = {deviceCode, name, peripheral, assigned_To};
             model = (DefaultTableModel) peripheralsTable.getModel();
             model.addRow(newRow);
         }
@@ -50,12 +61,21 @@ public class PeripheralsFrame extends javax.swing.JFrame {
         peripheralsTable = new javax.swing.JTable();
         deviceName = new javax.swing.JTextField();
         peripheralType = new javax.swing.JTextField();
-        assignedTo = new javax.swing.JTextField();
         deviceNameLabel = new javax.swing.JLabel();
         peripheralLabel = new javax.swing.JLabel();
         assignmentLabel = new javax.swing.JLabel();
         addBtn = new javax.swing.JButton();
         updateBtn = new javax.swing.JButton();
+        deleteBtn = new javax.swing.JButton();
+        availablePeripheralsBtn = new javax.swing.JButton();
+        assignedPeripheralsBtn = new javax.swing.JButton();
+        inputDevicesBtn = new javax.swing.JButton();
+        outputDevicesBtn = new javax.swing.JButton();
+        inputOutputBtn = new javax.swing.JButton();
+        peripheralsBtn = new javax.swing.JButton();
+        sortField = new javax.swing.JComboBox<>();
+        jLabel1 = new javax.swing.JLabel();
+        empNameField = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(153, 153, 255));
@@ -75,7 +95,7 @@ public class PeripheralsFrame extends javax.swing.JFrame {
             }
         });
         jScrollPane1.setViewportView(peripheralsTable);
-        peripheralsTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        peripheralsTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
         deviceName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -89,8 +109,10 @@ public class PeripheralsFrame extends javax.swing.JFrame {
 
         assignmentLabel.setText("Assigned to:");
 
-        addBtn.setBackground(new java.awt.Color(255, 102, 102));
+        addBtn.setBackground(new java.awt.Color(102, 153, 255));
         addBtn.setText("ADD");
+        addBtn.setBorder(null);
+        addBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         addBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addBtnActionPerformed(evt);
@@ -105,30 +127,114 @@ public class PeripheralsFrame extends javax.swing.JFrame {
             }
         });
 
+        deleteBtn.setBackground(new java.awt.Color(255, 102, 102));
+        deleteBtn.setText("DELETE");
+        deleteBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                deleteBtnMouseClicked(evt);
+            }
+        });
+
+        availablePeripheralsBtn.setBackground(javax.swing.UIManager.getDefaults().getColor("Actions.Yellow"));
+        availablePeripheralsBtn.setText("AVAILABLE PERIPHERALS");
+        availablePeripheralsBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                availablePeripheralsBtnMouseClicked(evt);
+            }
+        });
+
+        assignedPeripheralsBtn.setBackground(new java.awt.Color(204, 153, 255));
+        assignedPeripheralsBtn.setText("ASSIGNED PERIPERALS");
+        assignedPeripheralsBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                assignedPeripheralsBtnMouseClicked(evt);
+            }
+        });
+
+        inputDevicesBtn.setBackground(new java.awt.Color(0, 153, 153));
+        inputDevicesBtn.setText("INPUT DEVICES");
+        inputDevicesBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                inputDevicesBtnMouseClicked(evt);
+            }
+        });
+
+        outputDevicesBtn.setText("OUTPUT DEVICES");
+        outputDevicesBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                outputDevicesBtnMouseClicked(evt);
+            }
+        });
+
+        inputOutputBtn.setText("INPUT/OUTPUT DEVICES");
+        inputOutputBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                inputOutputBtnMouseClicked(evt);
+            }
+        });
+
+        peripheralsBtn.setText("PERIPHERALS");
+        peripheralsBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                peripheralsBtnMouseClicked(evt);
+            }
+        });
+
+        sortField.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ASC", "DESC" }));
+        sortField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sortFieldActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Sort by name:");
+
+        empNameField.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select Employee" }));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 804, Short.MAX_VALUE)
-                .addContainerGap())
             .addGroup(layout.createSequentialGroup()
-                .addGap(35, 35, 35)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 804, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(peripheralType, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
-                            .addComponent(deviceName)
-                            .addComponent(assignedTo))
-                        .addGap(118, 118, 118)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(addBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(updateBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)))
-                    .addComponent(deviceNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(peripheralLabel)
-                    .addComponent(assignmentLabel))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(peripheralLabel)
+                            .addComponent(assignmentLabel)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(peripheralType, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+                                    .addComponent(deviceName)
+                                    .addComponent(deviceNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(empNameField, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(inputDevicesBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(outputDevicesBtn)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(inputOutputBtn))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(peripheralsBtn)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(availablePeripheralsBtn)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(assignedPeripheralsBtn))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(addBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(updateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(deleteBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(sortField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -138,18 +244,31 @@ public class PeripheralsFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(deviceName, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(addBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(addBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(updateBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                    .addComponent(deleteBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addComponent(peripheralLabel)
-                .addGap(3, 3, 3)
+                .addGap(1, 1, 1)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(updateBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-                    .addComponent(peripheralType))
-                .addGap(18, 18, 18)
+                    .addComponent(peripheralType)
+                    .addComponent(peripheralsBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
+                    .addComponent(assignedPeripheralsBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(availablePeripheralsBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addComponent(assignmentLabel)
-                .addGap(5, 5, 5)
-                .addComponent(assignedTo, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+                .addGap(2, 2, 2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(inputDevicesBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(outputDevicesBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                        .addComponent(inputOutputBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(empNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(sortField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -166,14 +285,14 @@ public class PeripheralsFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         String device_name = deviceName.getText();
         String peripheral = peripheralType.getText();
-        String assigned_to = assignedTo.getText();
+        String assigned_to = empNameField.getSelectedItem().toString();
 
         if (device_name.isEmpty() && peripheral.isEmpty()) {
-            JOptionPane.showMessageDialog(new JFrame(), "Please fill in all the fields!");
+            JOptionPane.showMessageDialog(null, "Please fill in all the fields!");
         } else {
             var resData = Peripherals.create(device_name, peripheral, assigned_to);
             if (resData.get("success").toString().equals("true")) {
-                 JOptionPane.showMessageDialog(new JFrame(), "Added successfully!");
+                JOptionPane.showMessageDialog(null, "Added successfully!");
                 model.setRowCount(0);
                 this.populateTable();
             } else {
@@ -189,11 +308,12 @@ public class PeripheralsFrame extends javax.swing.JFrame {
         String name = model.getValueAt(peripheralsTable.getSelectedRow(), 1).toString();
         String peripheral = model.getValueAt(peripheralsTable.getSelectedRow(), 2).toString();
         String assigned_to = model.getValueAt(peripheralsTable.getSelectedRow(), 3).toString();
-
         //set to text field
         deviceName.setText(name);
         peripheralType.setText(peripheral);
-        assignedTo.setText(assigned_to);
+        empNameField.addItem(assigned_to);
+       
+
     }//GEN-LAST:event_peripheralsTableMouseClicked
 
     private void updateBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_updateBtnMouseClicked
@@ -201,14 +321,15 @@ public class PeripheralsFrame extends javax.swing.JFrame {
         String device_code = model.getValueAt(peripheralsTable.getSelectedRow(), 0).toString();
         String device_name = deviceName.getText();
         String peripheral = peripheralType.getText();
-        String assigned_to = assignedTo.getText();
+        String assigned_to = empNameField.getSelectedItem().toString();
 
         if (device_name.isEmpty() && peripheral.isEmpty()) {
-            JOptionPane.showMessageDialog(new JFrame(), "Please fill in all the fields!");
+            JOptionPane.showMessageDialog(null, "Please fill in all the fields!");
+
         } else {
             var resData = Peripherals.update(device_code, device_name, peripheral, assigned_to);
             if (resData.get("success").toString().equals("true")) {
-                 JOptionPane.showMessageDialog(new JFrame(), "Updated Successfully!");
+                JOptionPane.showMessageDialog(null, "Updated Successfully!");
                 model.setRowCount(0);
                 this.populateTable();
             } else {
@@ -216,6 +337,145 @@ public class PeripheralsFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_updateBtnMouseClicked
+
+    private void deleteBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteBtnMouseClicked
+        // TODO add your handling code here:
+        // TODO add your handling code here:
+        String device_code = model.getValueAt(peripheralsTable.getSelectedRow(), 0).toString();
+
+        if (device_code.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please provide device code");
+        } else {
+            var resData = Peripherals.delete(device_code);
+            if (resData.get("message").toString().equals("peripheral is assigned")) {
+                JOptionPane.showMessageDialog(null, "Peripheral is assigned, would you like to procceed unassigning it?");
+            }
+        }
+    }//GEN-LAST:event_deleteBtnMouseClicked
+
+    private void availablePeripheralsBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_availablePeripheralsBtnMouseClicked
+        // TODO add your handling code here:
+        model.setRowCount(0);
+        String[][] resData = Peripherals.availablePeripherals();
+        for (String[] data : resData) {
+            String deviceCode = data[0];
+            String name = data[1];
+            String peripheral = data[2];
+            String assigned_To = data[3];
+
+            Object[] newRow = {deviceCode, name, peripheral, assigned_To};
+            model = (DefaultTableModel) peripheralsTable.getModel();
+            model.addRow(newRow);
+        }
+    }//GEN-LAST:event_availablePeripheralsBtnMouseClicked
+
+    private void assignedPeripheralsBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_assignedPeripheralsBtnMouseClicked
+        // TODO add your handling code here:
+        model.setRowCount(0);
+        String[][] resData = Peripherals.assignedPeripherals();
+        for (String[] data : resData) {
+            String deviceCode = data[0];
+            String name = data[1];
+            String peripheral = data[2];
+            String assigned_To = data[3];
+
+            Object[] newRow = {deviceCode, name, peripheral, assigned_To};
+            model = (DefaultTableModel) peripheralsTable.getModel();
+            model.addRow(newRow);
+        }
+    }//GEN-LAST:event_assignedPeripheralsBtnMouseClicked
+
+    private void inputDevicesBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_inputDevicesBtnMouseClicked
+        // TODO add your handling code here:
+        model.setRowCount(0);
+        String[][] resData = Peripherals.fetchInputDevices();
+        for (String[] data : resData) {
+            String deviceCode = data[0];
+            String name = data[1];
+            String peripheral = data[2];
+            String assigned_To = data[3];
+
+            Object[] newRow = {deviceCode, name, peripheral, assigned_To};
+            model = (DefaultTableModel) peripheralsTable.getModel();
+            model.addRow(newRow);
+        }
+    }//GEN-LAST:event_inputDevicesBtnMouseClicked
+
+    private void outputDevicesBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_outputDevicesBtnMouseClicked
+        // TODO add your handling code here:
+        model.setRowCount(0);
+        String[][] resData = Peripherals.fetchOutputDevices();
+        for (String[] data : resData) {
+            String deviceCode = data[0];
+            String name = data[1];
+            String peripheral = data[2];
+            String assigned_To = data[3];
+
+            Object[] newRow = {deviceCode, name, peripheral, assigned_To};
+            model = (DefaultTableModel) peripheralsTable.getModel();
+            model.addRow(newRow);
+        }
+    }//GEN-LAST:event_outputDevicesBtnMouseClicked
+
+    private void inputOutputBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_inputOutputBtnMouseClicked
+        model.setRowCount(0);
+        String[][] resData = Peripherals.fetchInputOutputDevices();
+        for (String[] data : resData) {
+            String deviceCode = data[0];
+            String name = data[1];
+            String peripheral = data[2];
+            String assigned_To = data[3];
+
+            Object[] newRow = {deviceCode, name, peripheral, assigned_To};
+            model = (DefaultTableModel) peripheralsTable.getModel();
+            model.addRow(newRow);
+        }
+    }//GEN-LAST:event_inputOutputBtnMouseClicked
+
+    private void peripheralsBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_peripheralsBtnMouseClicked
+        model.setRowCount(0);
+        String[][] resData = Peripherals.peripherals();
+        for (String[] data : resData) {
+            String deviceCode = data[0];
+            String name = data[1];
+            String peripheral = data[2];
+            String assigned_To = data[3];
+
+            Object[] newRow = {deviceCode, name, peripheral, assigned_To};
+            model = (DefaultTableModel) peripheralsTable.getModel();
+            model.addRow(newRow);
+        }
+    }//GEN-LAST:event_peripheralsBtnMouseClicked
+
+    private void sortFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortFieldActionPerformed
+        // TODO add your handling code here:
+        model.setRowCount(0);
+        if (sortField.getSelectedItem().toString().equals("ASC")) {
+            String[][] resData = Peripherals.sortNameAsc();
+            for (String[] data : resData) {
+                String deviceCode = data[0];
+                String name = data[1];
+                String peripheral = data[2];
+                String assigned_To = data[3];
+
+                Object[] newRow = {deviceCode, name, peripheral, assigned_To};
+                model = (DefaultTableModel) peripheralsTable.getModel();
+                model.addRow(newRow);
+            }
+        }else{
+            String[][] resData = Peripherals.sortNameDesc();
+            for (String[] data : resData) {
+                String deviceCode = data[0];
+                String name = data[1];
+                String peripheral = data[2];
+                String assigned_To = data[3];
+
+                Object[] newRow = {deviceCode, name, peripheral, assigned_To};
+                model = (DefaultTableModel) peripheralsTable.getModel();
+                model.addRow(newRow);
+            }
+        }
+    }//GEN-LAST:event_sortFieldActionPerformed
 
     /**
      * @param args the command line arguments
@@ -254,14 +514,23 @@ public class PeripheralsFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addBtn;
-    private javax.swing.JTextField assignedTo;
+    private javax.swing.JButton assignedPeripheralsBtn;
     private javax.swing.JLabel assignmentLabel;
+    private javax.swing.JButton availablePeripheralsBtn;
+    private javax.swing.JButton deleteBtn;
     private javax.swing.JTextField deviceName;
     private javax.swing.JLabel deviceNameLabel;
+    private javax.swing.JComboBox<String> empNameField;
+    private javax.swing.JButton inputDevicesBtn;
+    private javax.swing.JButton inputOutputBtn;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton outputDevicesBtn;
     private javax.swing.JLabel peripheralLabel;
     private javax.swing.JTextField peripheralType;
+    private javax.swing.JButton peripheralsBtn;
     private javax.swing.JTable peripheralsTable;
+    private javax.swing.JComboBox<String> sortField;
     private javax.swing.JButton updateBtn;
     // End of variables declaration//GEN-END:variables
 }
