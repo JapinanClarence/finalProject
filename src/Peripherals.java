@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.ResultSetMetaData;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -34,6 +36,50 @@ public class Peripherals {
         // Database connection
         Connection conn = DriverManager.getConnection(url, username, password);
         return conn;
+    }
+    /**
+     * Will fetch the peripheral types
+     * @return all peripheral types
+     */
+    public static String[][] getPeripheralType() {
+        String[][] dataArray = null;
+        try {
+            String sql = "SELECT name FROM peripherals";
+            PreparedStatement statement = connect().prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet != null) {
+                // Get the column count
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                // Creating a list to store the data
+                List<String[]> data = new ArrayList<>();
+
+                // Iterating over the result set and populating the list
+                while (resultSet.next()) {
+
+                    String[] row = new String[columnCount];
+                    int index = 0;
+                    for (int i = 1; i <= columnCount; i++) {
+                        row[index++] = resultSet.getString(i);
+                    }
+                    data.add(row);
+
+                }
+                // Converting the list to a 2D array
+                dataArray = new String[data.size()][columnCount];
+                for (int i = 0; i < data.size(); i++) {
+                    dataArray[i] = data.get(i);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Employees.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return dataArray;
     }
 
     /**
@@ -409,53 +455,27 @@ public class Peripherals {
         }
         return dataArray;
     }
+
     /**
-     * Sort method
-     * Will sort peripheral devices by name in ascending order
-     * @return 
+     * Sort method Will sort peripheral devices by name in ascending order
+     *
+     * @param unsortedData
+     *
      */
-    public static String[][] sortNameAsc() {
-        String[][] dataArray = null;
-        try {
-            String sql = "SELECT * FROM devices ORDER BY name ASC";
-            PreparedStatement statement = connect().prepareStatement(sql);
-            ResultSet resultSet = statement.executeQuery();
-
-            if (resultSet != null) {
-                // Get the column count
-                ResultSetMetaData metaData = resultSet.getMetaData();
-                int columnCount = metaData.getColumnCount();
-
-                // Creating a list to store the data
-                List<String[]> data = new ArrayList<>();
-
-                // Iterating over the result set and populating the list
-                while (resultSet.next()) {
-
-                    String[] row = new String[columnCount];
-                    int index = 0;
-                    for (int i = 1; i <= columnCount; i++) {
-                        row[index++] = resultSet.getString(i);
-                    }
-                    data.add(row);
-                }
-                // Converting the list to a 2D array
-                dataArray = new String[data.size()][columnCount];
-                for (int i = 0; i < data.size(); i++) {
-                    dataArray[i] = data.get(i);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Employees.class.getName()).log(Level.SEVERE, null, ex);
+    public static List<String[]> sortNameAsc(String[][] unsortedData) {
+        //sort array
+        Arrays.sort(unsortedData, Comparator.comparing(arr -> arr[1]));
+        List<String[]> dataArray = new ArrayList<>();
+        for (String[] dataGet : unsortedData) {
+            dataArray.add(dataGet);
         }
         return dataArray;
     }
+
     /**
-     * Sort method
-     * Will sort peripheral devices by name in descending order
-     * @return 
+     * Sort method Will sort peripheral devices by name in descending order
+     *
+     * @return
      */
     public static String[][] sortNameDesc() {
         String[][] dataArray = null;
@@ -495,6 +515,7 @@ public class Peripherals {
         }
         return dataArray;
     }
+
     /**
      * Update Method
      *
